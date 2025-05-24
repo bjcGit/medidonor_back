@@ -11,8 +11,4 @@ export class LoginUserDto {
     @IsString()
     password: string;
 
-    @ApiProperty()
-    @IsString()
-    token: string
-
 }
