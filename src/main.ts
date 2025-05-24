@@ -19,11 +19,11 @@ async function bootstrap() {
   );
   app.enableCors({});
   const config = new DocumentBuilder()
-    .setTitle("Apis para las licencias")
+    .setTitle("Apis del back Medidonor")
     .setDescription(
       "Documentación de las Apis para Medidonor."
     )
-    .setVersion("2.0")
+    .setVersion("1.0")
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("docs", app, document);
@@ -32,7 +32,7 @@ async function bootstrap() {
 
   await app.listen(process.env.PORT, "0.0.0.0");
 
-  logger.log(`App corriendo en: http://${process.env.HOST_API}/med`);
-  logger.log(`Swagger docs en: http://${process.env.HOST_API}/docs`);
+  logger.log(`App corriendo en: ${process.env.HOST_API}/med`);
+  logger.log(`Swagger docs en: ${process.env.HOST_API}/docs`);
 }
 bootstrap();
