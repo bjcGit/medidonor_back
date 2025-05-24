@@ -28,48 +28,53 @@ export class AuthService {
   }
 
   async login(loginUserDto: LoginUserDto) {
-    const { correo, password } = loginUserDto;
+    try {
+      const { correo, password } = loginUserDto;
 
-    const user = await this.authRepository.findOne({
-      where: { correo },
-      select: {
-        id: true,
-        correo: true,
-        rols: true,
-        nombre: true,
-        isActive: true,
-        password: true,
-      },
-    });
+      const user = await this.authRepository.findOne({
+        where: { correo },
+        select: {
+          id: true,
+          correo: true,
+          rols: true,
+          nombre: true,
+          isActive: true,
+          password: true,
+        },
+      });
 
-    // Verificar si el usuario existe
-    if (!user) {
-      throw new BadRequestException("Credenciales incorrectas");
+      // Verificar si el usuario existe
+      if (!user) {
+        throw new BadRequestException("Credenciales incorrectas");
+      }
+
+      // Verificar si el usuario está activo
+      if (!user.isActive) {
+        throw new BadRequestException(
+          "Usuario desactivado, comunícate con el administrador"
+        );
+      }
+
+      // Validar la contraseña
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) {
+        throw new BadRequestException("Credenciales incorrectas");
+      }
+
+      // Respuesta exitosa, excluyendo la contraseña
+      return {
+        token: this.getJwtToken({ id: user.id }),
+        user: {
+          id: user.id,
+          correo: user.correo,
+          nombre: user.nombre,
+          rols: user.rols,
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      throw handleCustomError(error);
     }
-
-    // Verificar si el usuario está activo
-    if (!user.isActive) {
-      throw new BadRequestException(
-        "Usuario desactivado, comunícate con el administrador"
-      );
-    }
-
-    // Validar la contraseña
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      throw new BadRequestException("Credenciales incorrectas");
-    }
-
-    // Respuesta exitosa, excluyendo la contraseña
-    return {
-      token: this.getJwtToken({ id: user.id }),
-      user: {
-        id: user.id,
-        correo: user.correo,
-        nombre: user.nombre,
-        rol: user.rols,
-      },
-    };
   }
 
   async checkAuthStatus(user: Usuario) {

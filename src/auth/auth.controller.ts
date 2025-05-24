@@ -10,18 +10,16 @@ import { UserRoleGuard } from './guards/user-role.guard';
 import { RolProtected } from './decorator/rol-protected.decorator';
 import { Rol } from './interfaces/valid-rol';
 import { Auth } from './decorator/auth.decorator';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) { }
+  constructor(private readonly authService: AuthService) {}
 
   @Post('register')
   // @Auth(Rol.admin)
-  create(
-    @Body() createUserDto: CreateUserDto)
-     {
+  create(@Body() createUserDto: CreateUserDto) {
     return this.authService.create(createUserDto);
   }
 
@@ -31,49 +29,41 @@ export class AuthController {
   }
 
   @Get('revalidate')
+  @ApiBearerAuth('token') 
   @UseGuards(AuthGuard())
-  validateToken(
-    @Req() req: Express.Request,
-    @GetUser() user: Usuario,   
-  ) {
+  validateToken(@Req() req: Express.Request, @GetUser() user: Usuario) {
     return {
       ok: true,
       msg: 'Validando el token',
-      user      
-    }
+      user,
+    };
   }
 
   @Get('validate')
+  @ApiBearerAuth('token') 
   @RolProtected(Rol.admin)
   @UseGuards(AuthGuard(), UserRoleGuard)
-  findvalidateUser(
-    @GetUser() user: Usuario,
-    
-  ) {
+  findvalidateUser(@GetUser() user: Usuario) {
     return {
       ok: true,
-      user
-    }
+      user,
+    };
   }
 
   @Get('validateData')
+  @ApiBearerAuth('token') 
   @Auth()
-  validateData(
-    @GetUser() user: Usuario,
-    
-  ) {
+  validateData(@GetUser() user: Usuario) {
     return {
       ok: true,
-      user
-    }
+      user,
+    };
   }
 
   @Get('check-status')
+  @ApiBearerAuth('token') 
   @Auth()
-  checkAuthStatus(
-    @GetUser() user:Usuario
-  ){
-    return this.authService.checkAuthStatus(user)
+  checkAuthStatus(@GetUser() user: Usuario) {
+    return this.authService.checkAuthStatus(user);
   }
-
 }

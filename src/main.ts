@@ -18,12 +18,20 @@ async function bootstrap() {
     })
   );
   app.enableCors({});
+
+  // Configuración de Swagger
   const config = new DocumentBuilder()
     .setTitle("Apis del back Medidonor")
-    .setDescription(
-      "Documentación de las Apis para Medidonor."
-    )
+    .setDescription("Documentación de las Apis para Medidonor.")
     .setVersion("1.0")
+    .addBearerAuth( 
+      {
+        type: "http",
+        scheme: "bearer",
+        bearerFormat: "JWT",
+      },
+      "token"
+    )
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("docs", app, document);
