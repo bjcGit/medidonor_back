@@ -21,6 +21,9 @@ import { SeedModule } from './seed/seed.module';
       database: process.env.PD_NAMEDB,
       autoLoadEntities: true,
       synchronize: true,
+      ssl: {
+        rejectUnauthorized: false
+      }
     }),
 
     CommonModule,   
