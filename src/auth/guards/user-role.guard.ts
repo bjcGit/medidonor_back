@@ -32,11 +32,11 @@ export class UserRoleGuard implements CanActivate {
       throw new BadRequestException("No existe el usuario");
     }
 
-    if (!user.rol) {
+    if (!user.rols) {
       throw new BadRequestException("El rol del usuario no está definido");
     }
 
-    if (validRol.includes(user.rol)) {
+    if (validRol.includes(user.rols[0])) {
       return true;
     }
     throw new ForbiddenException(

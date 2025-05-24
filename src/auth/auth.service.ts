@@ -1,6 +1,5 @@
 import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Usuario } from './entities/user.entity';
 import { Repository } from 'typeorm';
@@ -8,7 +7,6 @@ import { handleCustomError } from 'src/functions/error';
 import { LoginUserDto } from './dto/login-user.dto';
 import { JwtPayload } from './interfaces/jwt-payload';
 import { JwtService } from '@nestjs/jwt'
-import { MenuSiderbar } from 'src/middleware/menu.response';
 import * as bcrypt from 'bcryptjs';
 
 @Injectable()
@@ -25,14 +23,14 @@ export class AuthService {
   }
 
   async login(loginUserDto: LoginUserDto) {
-    const { correo } = loginUserDto;
+    const { correo, password } = loginUserDto;
    
     const user = await this.authRepository.findOne({
       where: { correo },
       select: {
         correo: true,
-        uid: true, 
-        rol: true,
+        id: true, 
+        rols: true,
         nombre: true,
         isActive: true
       }
@@ -45,30 +43,27 @@ export class AuthService {
     if (!user.isActive) {
       throw new BadRequestException('Usuario desactivado, comunicate con el administrador');
     }
-
-    const menu = MenuSiderbar(user.rol);
-
     // Respuesta exitosa incluyendo manejo de error de servicio externo
     return {
-        token: this.getJwtToken({ uid: user.uid }),
+        token: this.getJwtToken({ id: user.id }),
         user: {
-          uid: user.uid,
+          id: user.id,
           correo: user.correo,
           nombre: user.nombre,
-          rol: user.rol,
+          rol: user.rols,
   
         },
-        menu: menu      
+       
     };
   }
 
 
   async checkAuthStatus(user: Usuario){
-    const {uid} = user
-    const token = this.getJwtToken({uid})
+    const {id} = user
+    const token = this.getJwtToken({id})
     return {
       ok: true,    
-      uid,
+      id,
       token,
       user
     }

@@ -1,12 +1,12 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsBoolean, IsEmail, IsJSON, IsNumber, IsObject, IsOptional, IsString, Matches, MaxLength, MinLength } from "class-validator";
+import { IsArray, IsBoolean, IsEmail, IsJSON, IsNumber, IsObject, IsOptional, IsString, Matches, MaxLength, MinLength } from "class-validator";
 
 export class CreateUserDto {
 
     @ApiProperty()
-    @IsString({
-        message: 'El rol es necesario'})
-    rol: string
+    @IsArray()
+    @IsOptional()
+    rols?: string[]
 
     @ApiProperty()
     @IsString({message: 'El documento es necesario'})

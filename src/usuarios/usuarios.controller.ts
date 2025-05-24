@@ -18,26 +18,26 @@ export class UsuariosController {
   constructor(private readonly usuariosService: UsuariosService) {}
 
   @Get("")
-  @Auth(Rol.admin)
+  // @Auth(Rol.admin)
   findAll(@Query("page") page?: number, @Query("limit") limit?: number) {
     return this.usuariosService.findAll(page, limit);
   }
 
   @Get("/:id")
   // @Auth(Rol.admin)
-  findOne(@Param("id") uid: string) {
-    return this.usuariosService.findOne(uid);
+  findOne(@Param("id") id: string) {
+    return this.usuariosService.findOne(id);
   }
 
   @Patch("/:id")
   // @Auth(Rol.admin)
-  update(@Param("id") uid: string, @Body() updateUsuarioDto: UpdateUserDto) {
-    return this.usuariosService.update(uid, updateUsuarioDto);
+  update(@Param("id") id: string, @Body() updateUsuarioDto: UpdateUserDto) {
+    return this.usuariosService.update(id, updateUsuarioDto);
   }
 
   @Patch("desactivar/:id")
   // @Auth(Rol.admin)
-  desactivar(@Param("id") uid: string) {
-    return this.usuariosService.desactivar(uid);
+  desactivar(@Param("id") id: string) {
+    return this.usuariosService.desactivar(id);
   }
 }

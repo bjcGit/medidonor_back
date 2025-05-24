@@ -1,11 +1,7 @@
-
-import { Role } from 'src/roles/entities/role.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinTable,
-  ManyToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -14,32 +10,32 @@ import {
 export class Usuario {
 
   @PrimaryGeneratedColumn('uuid')
-  uid: string;
+  id: string;
 
-  @Column('varchar')
-  rol: string;
+  @Column('text',{
+    array: true,
+    nullable: true,
+    default: ['USER']
+  })
+  rols: string[];
   
-  @Column('varchar',{ unique: true})
+  @Column('text',{ unique: true})
   documento: string;
 
-  @Column('varchar')
+  @Column('text')
   nombre: string;
 
-  @Column('varchar', { unique: true })
+  @Column('text', { unique: true })
   telefono: string;
 
-  @Column('varchar', { unique: true })
+  @Column('text', { unique: true })
   correo: string;
 
-  @Column('varchar', { select: false })
+  @Column('text', { select: false })
   password: string;
 
-  @Column('varchar', { nullable: true, default: 'No registra' })
+  @Column('text', { nullable: true, default: 'No registra' })
   direccion: string;
-
-  @ManyToMany(() => Role, { cascade: true })
-  @JoinTable({name: 'rol_usuario'})
-  roles: Role[];
 
   @CreateDateColumn()
   createAt: Date;

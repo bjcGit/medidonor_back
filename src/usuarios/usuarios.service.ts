@@ -29,11 +29,11 @@ export class UsuariosService {
     }
   }
 
-  async findOne(uid: string): Promise<Usuario> {
+  async findOne(id: string): Promise<Usuario> {
 
     try {
 
-      const usuario = await this.usuarioRepository.findOneBy({ uid })
+      const usuario = await this.usuarioRepository.findOneBy({ id })
 
       if (!usuario.isActive) {
         throw new BadRequestException('El usuario esta desactivado')
@@ -42,13 +42,13 @@ export class UsuariosService {
       }
     } catch (error) {
       console.log(error)
-      throw new BadRequestException(`No se encontro el ID: ${uid}`)
+      throw new BadRequestException(`No se encontro el ID: ${id}`)
     }
   }
 
-async update(uid: string, updateUserDto: UpdateUserDto): Promise<Usuario> {
+async update(id: string, updateUserDto: UpdateUserDto): Promise<Usuario> {
   try {
-    const usuario = await this.usuarioRepository.findOne({ where: { uid } });
+    const usuario = await this.usuarioRepository.findOne({ where: { id } });
     if (!usuario) {
       throw new NotFoundException('Usuario no encontrado');
     }
@@ -56,7 +56,7 @@ async update(uid: string, updateUserDto: UpdateUserDto): Promise<Usuario> {
     // Validar correo si se va a actualizar
     if (updateUserDto.correo && updateUserDto.correo !== usuario.correo) {
       const correoExistente = await this.usuarioRepository.findOne({ where: { correo: updateUserDto.correo } });
-      if (correoExistente && correoExistente.uid !== uid) {
+      if (correoExistente && correoExistente.id !== id) {
         throw new BadRequestException('El correo ya está registrado');
       }
     }
@@ -64,7 +64,7 @@ async update(uid: string, updateUserDto: UpdateUserDto): Promise<Usuario> {
     // Validar teléfono si se va a actualizar
     if (updateUserDto.telefono && updateUserDto.telefono !== usuario.telefono) {
       const telefonoExistente = await this.usuarioRepository.findOne({ where: { telefono: updateUserDto.telefono } });
-      if (telefonoExistente && telefonoExistente.uid !== uid) {
+      if (telefonoExistente && telefonoExistente.id !== id) {
         throw new BadRequestException('El teléfono ya está registrado');
       }
     }
@@ -72,7 +72,7 @@ async update(uid: string, updateUserDto: UpdateUserDto): Promise<Usuario> {
     // Validar documento si se va a actualizar
     if (updateUserDto.documento && updateUserDto.documento !== usuario.documento) {
       const documentoExistente = await this.usuarioRepository.findOne({ where: { documento: updateUserDto.documento } });
-      if (documentoExistente && documentoExistente.uid !== uid) {
+      if (documentoExistente && documentoExistente.id !== id) {
         throw new BadRequestException('El documento ya está registrado');
       }
     }
@@ -94,22 +94,22 @@ async update(uid: string, updateUserDto: UpdateUserDto): Promise<Usuario> {
   }
 }
 
-  async desactivar(uid: string) {
+  async desactivar(id: string) {
     try {
     
-      const usuario = await this.usuarioRepository.findOneBy({ uid });
+      const usuario = await this.usuarioRepository.findOneBy({ id });
 
       if (!usuario) {
         throw new BadRequestException('El usuario no existe');
       }
     
-      await this.usuarioRepository.update(uid, { isActive: !usuario.isActive });
+      await this.usuarioRepository.update(id, { isActive: !usuario.isActive });
 
       const estadoActualizado = usuario.isActive ? 'desactivado' : 'activado';
       return { mensaje: `Usuario ${estadoActualizado} correctamente` };
     } catch (error) {
       console.error(error);
-      throw new BadRequestException(`No se pudo cambiar el estado del usuario con el ID: ${uid}`);
+      throw new BadRequestException(`No se pudo cambiar el estado del usuario con el ID: ${id}`);
     }
   }
 }
