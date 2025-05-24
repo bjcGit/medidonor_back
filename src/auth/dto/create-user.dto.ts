@@ -6,6 +6,7 @@ export class CreateUserDto {
     @ApiProperty()
     @IsArray()
     @IsOptional()
+    @IsString({each: true})
     rols?: string[]
 
     @ApiProperty()

@@ -1,7 +1,9 @@
+import { Medicamento } from 'src/medicamentos/entities/medicamento.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -36,6 +38,9 @@ export class Usuario {
 
   @Column('text', { nullable: true, default: 'No registra' })
   direccion: string;
+
+  @OneToMany(() => Medicamento, (medicamento) => medicamento.usuario)
+  medicamentos: Medicamento[];
 
   @CreateDateColumn()
   createAt: Date;
