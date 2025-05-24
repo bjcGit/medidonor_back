@@ -10,7 +10,7 @@ async function bootstrap() {
   const logger = new Logger("bootstrap");
   app.useGlobalInterceptors(new ResponseInterceptor());
   app.useGlobalFilters(new AllExceptionsFilter());
-  app.setGlobalPrefix("gen");
+  app.setGlobalPrefix("med");
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -21,7 +21,7 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle("Apis para las licencias")
     .setDescription(
-      "Encontrarás todas las apis que usa el servidor para las licencias."
+      "Documentación de las Apis para Medidonor."
     )
     .setVersion("2.0")
     .build();
