@@ -31,13 +31,8 @@ async function bootstrap() {
   const port = process.env.PORT || 3000;
 
   await app.listen(process.env.PORT, "0.0.0.0");
-  const server = app.getHttpServer();
-  const address =
-    server.address().address === "0.0.0.0"
-      ? "localhost"
-      : server.address().address;
 
-  logger.log(`App corriendo en: http://${address}:${port}/gen`);
-  logger.log(`Swagger docs en: http://${address}:${port}/docs`);
+  logger.log(`App corriendo en: http://${process.env.HOST_API}/med`);
+  logger.log(`Swagger docs en: http://${process.env.HOST_API}/docs`);
 }
 bootstrap();
