@@ -88,7 +88,9 @@ export class AuthService {
     };
   }
 
-  async create(createUserDto: CreateUserDto): Promise<Usuario> {
+  async create(
+    createUserDto: CreateUserDto
+  ): Promise<{ token: string; user: Partial<Usuario> }> {
     try {
       const { correo, telefono, documento } = createUserDto;
 
@@ -127,9 +129,21 @@ export class AuthService {
 
       await this.authRepository.save(user);
 
-      // No retornar la contraseña en la respuesta
-      const { password, ...userWithoutPassword } = user;
-      return userWithoutPassword as Usuario;
+      // Generar el token JWT
+      const token = this.getJwtToken({ id: user.id });
+
+      // Retornar solo los campos deseados del usuario, excluyendo la contraseña
+      const userResponse = {
+        id: user.id,
+        correo: user.correo,
+        nombre: user.nombre,
+        rols: user.rols,
+      };
+
+      return {
+        token,
+        user: userResponse,
+      };
     } catch (error) {
       console.log(error);
       throw handleCustomError(error);
