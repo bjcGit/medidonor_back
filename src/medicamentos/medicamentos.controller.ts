@@ -15,11 +15,12 @@ export class MedicamentosController {
 
   @Post()
   @ApiBearerAuth('token')
-  @UseGuards(AuthGuard())
-  create(@Body() createMedicamentoDto: CreateMedicamentoDto, 
-  @GetUser() user: Usuario) {   
-    createMedicamentoDto.usuarioId = user.id;
-    return this.medicamentosService.create(createMedicamentoDto);
+  @UseGuards()
+  create(
+    @Body() createMedicamentoDto: CreateMedicamentoDto, 
+    @GetUser() user: Usuario
+  ) {   
+    return this.medicamentosService.create(createMedicamentoDto, user);
   }
 
   @Get()
@@ -36,8 +37,13 @@ export class MedicamentosController {
 
   @Patch(':id')
   @ApiBearerAuth('token')
-  update(@Param('id') id: string, @Body() updateMedicamentoDto: UpdateMedicamentoDto) {
-    return this.medicamentosService.update(id, updateMedicamentoDto);
+  @UseGuards()
+  update(
+    @Param('id') id: string, 
+    @Body() updateMedicamentoDto: UpdateMedicamentoDto,
+     @GetUser() user: Usuario
+  ) {
+    return this.medicamentosService.update(id, updateMedicamentoDto, user);
   }
 
   @Delete(':id')

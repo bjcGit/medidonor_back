@@ -29,10 +29,6 @@ export class CreateMedicamentoDto {
     descripcion: string
 
     @ApiProperty()
-    @IsString({ message: 'El ID del usuario es necesario' })
-    usuarioId: string;
-
-    @ApiProperty()
     @IsString()
     @IsOptional()
     disponibilidad?: string

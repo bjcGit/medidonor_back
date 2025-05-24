@@ -18,29 +18,18 @@ export class MedicamentosService {
     private readonly usuarioRepository: Repository<Usuario>,
   ){}
 
-async create(createMedicamentoDto: CreateMedicamentoDto) {
+async create(createMedicamentoDto: CreateMedicamentoDto, usuario: Usuario) {
     try {
-      // Verificar que el usuario exista
-      const usuario = await this.usuarioRepository.findOne({
-        where: { id: createMedicamentoDto.usuarioId, isActive: true },
-      });
-
-      if (!usuario) {
-        throw new NotFoundException(`Usuario con ID ${createMedicamentoDto.usuarioId} no encontrado`);
-      }
-
-      // Crear el medicamento con la relación al usuario
       const medicamento = this.medicamentoRepository.create({
         ...createMedicamentoDto,
-        usuario, // Asignar la entidad Usuario
+        usuario, 
       });
       await this.medicamentoRepository.save(medicamento);
 
       return {
         medicamento,
-        usuario: usuario.nombre
-      }
-
+        usuario: usuario.nombre, 
+      };
     } catch (error) {
       console.log(error);
       throw handleCustomError(error);
@@ -84,26 +73,20 @@ async create(createMedicamentoDto: CreateMedicamentoDto) {
     }
   }
 
-  async update(id: string, updateMedicamentoDto: UpdateMedicamentoDto) {
+  async update(id: string, updateMedicamentoDto: UpdateMedicamentoDto, usuario: Usuario) {
     try {
       const medicamento = await this.findOne(id);
-      let usuario: Usuario | undefined;
-
-      
-      if (updateMedicamentoDto.usuarioId) {
-        usuario = await this.usuarioRepository.findOne({
-          where: { id: updateMedicamentoDto.usuarioId, isActive: true },
-        });
-        if (!usuario) {
-          throw new NotFoundException(`Usuario con ID ${updateMedicamentoDto.usuarioId} no encontrado`);
-        }
-      }
-
-      const updatedMedicamento = this.medicamentoRepository.merge(medicamento, {
+          const updatedMedicamento = this.medicamentoRepository.merge(medicamento, {
         ...updateMedicamentoDto,
         usuario: usuario || medicamento.usuario, 
       });
-      return await this.medicamentoRepository.save(updatedMedicamento);
+      await this.medicamentoRepository.save(updatedMedicamento);
+
+      return {
+        medicamento,
+        usuario: usuario.nombre
+      }
+
     } catch (error) {
       console.log(error);
       throw handleCustomError(error);
