@@ -11,27 +11,27 @@ import { EntregasModule } from './entregas/entregas.module';
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    // TypeOrmModule.forRoot({
-    //   type: "postgres",
-    //   host: process.env.PD_HOST,
-    //   port: +process.env.PD_PORT,
-    //   username: process.env.PD_USERNAME,
-    //   password: process.env.PD_PASSWORD,
-    //   database: process.env.PD_NAMEDB,
-    //   autoLoadEntities: true,
-    //   synchronize: true,
-    // }),
-
-    //Para deplegar en render
     TypeOrmModule.forRoot({
       type: "postgres",
-      url: process.env.DATABASE_URL,
+      host: process.env.PD_HOST,
+      port: +process.env.PD_PORT,
+      username: process.env.PD_USERNAME,
+      password: process.env.PD_PASSWORD,
+      database: process.env.PD_NAMEDB,
       autoLoadEntities: true,
       synchronize: true,
-      ssl: {
-        rejectUnauthorized: false, 
-      },
     }),
+
+    //Para deplegar en render
+    // TypeOrmModule.forRoot({
+    //   type: "postgres",
+    //   url: process.env.DATABASE_URL,
+    //   autoLoadEntities: true,
+    //   synchronize: true,
+    //   ssl: {
+    //     rejectUnauthorized: false, 
+    //   },
+    // }),
 
     CommonModule,
     AuthModule,
