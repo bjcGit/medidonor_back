@@ -6,18 +6,32 @@
 
 1. Clonar el repositorio
 2. Ejecutar
+
 ```
 yarn install
 ```
 
 3. Tener Nest CLI instalado
+
 ```
 npm i -g @nestjs/cli
 ```
 
-4. Tener Docker instalado y descargar la imagen de mongo v5.0.0
+4. Tener Docker instalado y descargar la imagen de postgres 15
+```
+docker pull postgres:15
+```
 
 5. Levantar la base de datos
+
 ```
 docker-compose up -d
+```
+
+6. Tener algun gestor que de base de datos Table plus, DBeaver
+
+7. Ejecutar el comando 
+
+```
+yarn start:dev
 ```
