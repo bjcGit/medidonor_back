@@ -12,7 +12,7 @@ import { handleCustomError } from "src/functions/error";
 import { LoginUserDto } from "./dto/login-user.dto";
 import { JwtPayload } from "./interfaces/jwt-payload";
 import { JwtService } from "@nestjs/jwt";
-import * as bcrypt from "bcrypt";
+import * as bcrypt from "bcryptjs";
 
 @Injectable()
 export class AuthService {
