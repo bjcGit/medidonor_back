@@ -20,10 +20,7 @@ import { SeedModule } from './seed/seed.module';
       password: process.env.PD_PASSWORD,
       database: process.env.PD_NAMEDB,
       autoLoadEntities: true,
-      synchronize: true,
-      ssl: {
-        rejectUnauthorized: false
-      }
+      synchronize: false
     }),
 
     CommonModule,   
