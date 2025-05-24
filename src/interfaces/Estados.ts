@@ -1,0 +1,7 @@
+export enum EstadoNovedad {
+    EJECUCION = 'EN EJECUCION',
+    PENDIENTE = 'PENDIENTE',
+    ANULADO = 'ANULADO',
+    SUSPENDIDO = 'SUSPENDIDO',
+    TERM_ANT = 'TERMINACION ANTICIPADA',    
+}

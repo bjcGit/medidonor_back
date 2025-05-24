@@ -1,0 +1,115 @@
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { UpdateUserDto } from 'src/auth/dto/update-user.dto';
+import { Usuario } from 'src/auth/entities/user.entity';
+import { paginate } from 'src/common/helpers/pagination.helper';
+import { handleCustomError } from 'src/functions/error';
+import { Repository } from 'typeorm';
+import * as bcrypt from 'bcryptjs';
+
+@Injectable()
+export class UsuariosService {
+
+  constructor(
+    @InjectRepository(Usuario)
+    private readonly usuarioRepository: Repository<Usuario>,
+  ) { }
+
+  async findAll(page = 1, limit = 10) {
+    try {
+      const [usuarios, total] = await this.usuarioRepository.findAndCount({
+        skip: (page - 1) * limit,
+        take: limit,
+      });
+
+      return paginate(usuarios, total, page, limit); // <-- Usa el helper
+    } catch (error) {
+      console.log(error);
+      throw new BadRequestException('No es posible traer los usuarios');
+    }
+  }
+
+  async findOne(uid: string): Promise<Usuario> {
+
+    try {
+
+      const usuario = await this.usuarioRepository.findOneBy({ uid })
+
+      if (!usuario.isActive) {
+        throw new BadRequestException('El usuario esta desactivado')
+      } else {
+        return usuario
+      }
+    } catch (error) {
+      console.log(error)
+      throw new BadRequestException(`No se encontro el ID: ${uid}`)
+    }
+  }
+
+async update(uid: string, updateUserDto: UpdateUserDto): Promise<Usuario> {
+  try {
+    const usuario = await this.usuarioRepository.findOne({ where: { uid } });
+    if (!usuario) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+
+    // Validar correo si se va a actualizar
+    if (updateUserDto.correo && updateUserDto.correo !== usuario.correo) {
+      const correoExistente = await this.usuarioRepository.findOne({ where: { correo: updateUserDto.correo } });
+      if (correoExistente && correoExistente.uid !== uid) {
+        throw new BadRequestException('El correo ya está registrado');
+      }
+    }
+
+    // Validar teléfono si se va a actualizar
+    if (updateUserDto.telefono && updateUserDto.telefono !== usuario.telefono) {
+      const telefonoExistente = await this.usuarioRepository.findOne({ where: { telefono: updateUserDto.telefono } });
+      if (telefonoExistente && telefonoExistente.uid !== uid) {
+        throw new BadRequestException('El teléfono ya está registrado');
+      }
+    }
+
+    // Validar documento si se va a actualizar
+    if (updateUserDto.documento && updateUserDto.documento !== usuario.documento) {
+      const documentoExistente = await this.usuarioRepository.findOne({ where: { documento: updateUserDto.documento } });
+      if (documentoExistente && documentoExistente.uid !== uid) {
+        throw new BadRequestException('El documento ya está registrado');
+      }
+    }
+
+    // Encriptar la contraseña si se va a actualizar
+    if (updateUserDto.password) {
+      updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
+    }
+
+    // Actualizar el usuario
+    const usuarioActualizado = this.usuarioRepository.merge(usuario, updateUserDto);
+    await this.usuarioRepository.save(usuarioActualizado);
+
+    // No retornar la contraseña en la respuesta
+    const { password, ...userWithoutPassword } = usuarioActualizado;
+    return userWithoutPassword as Usuario;
+  } catch (error) {
+    throw handleCustomError(error);
+  }
+}
+
+  async desactivar(uid: string) {
+    try {
+    
+      const usuario = await this.usuarioRepository.findOneBy({ uid });
+
+      if (!usuario) {
+        throw new BadRequestException('El usuario no existe');
+      }
+    
+      await this.usuarioRepository.update(uid, { isActive: !usuario.isActive });
+
+      const estadoActualizado = usuario.isActive ? 'desactivado' : 'activado';
+      return { mensaje: `Usuario ${estadoActualizado} correctamente` };
+    } catch (error) {
+      console.error(error);
+      throw new BadRequestException(`No se pudo cambiar el estado del usuario con el ID: ${uid}`);
+    }
+  }
+}
