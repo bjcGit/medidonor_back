@@ -20,13 +20,15 @@ import { SeedModule } from "./seed/seed.module";
     //   autoLoadEntities: true,
     //   synchronize: false,
     // }),
+
+    //Para deplegar en render
     TypeOrmModule.forRoot({
       type: "postgres",
-      url: process.env.DATABASE_URL, // Usa la URL directamente
+      url: process.env.DATABASE_URL,
       autoLoadEntities: true,
       synchronize: false,
       ssl: {
-        rejectUnauthorized: false, // Necesario para Render
+        rejectUnauthorized: false, 
       },
     }),
 
