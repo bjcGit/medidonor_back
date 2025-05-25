@@ -33,9 +33,9 @@ export class MedicamentosService {
     try {
       const medicamentos = await this.medicamentoRepository.find({
         where: { isActive: true },
-        relations: ["usuario"], // Incluir datos del usuario
+        relations: ["usuario"],
         select: {
-          usuario: { id: true, nombre: true, telefono: true, rols: true }, // Seleccionar solo id y nombre del usuario
+          usuario: { id: true, nombre: true, telefono: true, rols: true },
         },
       });
 
@@ -68,19 +68,19 @@ export class MedicamentosService {
   async update(
     id: string,
     updateMedicamentoDto: UpdateMedicamentoDto,
-    usuario?: Usuario
+    usuario?: Usuario // Hacer el parámetro opcional
   ) {
     try {
       const medicamento = await this.findOne(id);
       const updatedMedicamento = this.medicamentoRepository.merge(medicamento, {
         ...updateMedicamentoDto,
-        usuario: usuario || medicamento.usuario,
+        usuario: usuario || medicamento.usuario, // Usar el usuario existente si no se proporciona
       });
       await this.medicamentoRepository.save(updatedMedicamento);
-   
+
       return {
-        medicamento,
-        usuario: usuario.id,
+        medicamento: updatedMedicamento,
+        usuario: updatedMedicamento.usuario.id,
       };
     } catch (error) {
       console.log(error);
@@ -90,8 +90,8 @@ export class MedicamentosService {
 
   async remove(id: string) {
     try {
-      const medicamento = await this.findOne(id); // Verificar existencia
-      await this.medicamentoRepository.update(id, { isActive: false }); // Soft delete
+      const medicamento = await this.findOne(id);
+      await this.medicamentoRepository.update(id, { isActive: false });
       return {
         medicamento,
         message: `Medicamento con ID ${medicamento.nombre} eliminado`,
