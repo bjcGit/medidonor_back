@@ -9,6 +9,7 @@ export class LoginUserDto {
 
     @ApiProperty()
     @IsString()
-    password: string;
+    @IsOptional()
+    password?: string;
 
 }

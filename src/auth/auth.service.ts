@@ -88,9 +88,7 @@ export class AuthService {
     };
   }
 
-  async create(
-    createUserDto: CreateUserDto
-  ): Promise<{ token: string; user: Partial<Usuario> }> {
+  async create( createUserDto: CreateUserDto ): Promise<{ token: string; user: Partial<Usuario> }> {
     try {
       const { correo, telefono, documento } = createUserDto;
 

@@ -21,7 +21,6 @@ export class MedicamentosController {
     @Body() createMedicamentoDto: CreateMedicamentoDto, 
     @GetUser() user: Usuario
   ) {   
-    console.log('Usuario en la ricues', user)
     return this.medicamentosService.create(createMedicamentoDto, user);
   }
 
@@ -39,7 +38,7 @@ export class MedicamentosController {
 
   @Patch(':id')
   @ApiBearerAuth('token')
-  @UseGuards()
+  @Auth()
   update(
     @Param('id') id: string, 
     @Body() updateMedicamentoDto: UpdateMedicamentoDto,

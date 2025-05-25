@@ -33,7 +33,7 @@ export class Usuario {
   @Column('text', { unique: true })
   correo: string;
 
-  @Column('text', { select: false })
+  @Column('text', { select: false, nullable: true, default: 'No registra' })
   password: string;
 
   @Column('text', { nullable: true, default: 'No registra' })
