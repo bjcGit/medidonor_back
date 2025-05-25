@@ -6,6 +6,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from '../auth/decorator/get-user.decorator';
 import { Usuario } from 'src/auth/entities/user.entity';
+import { Auth } from 'src/auth/decorator/auth.decorator';
 
 
 @ApiTags('medicamentos')
@@ -15,11 +16,12 @@ export class MedicamentosController {
 
   @Post()
   @ApiBearerAuth('token')
-  @UseGuards()
+  @Auth()
   create(
     @Body() createMedicamentoDto: CreateMedicamentoDto, 
     @GetUser() user: Usuario
   ) {   
+    console.log('Usuario en la ricues', user)
     return this.medicamentosService.create(createMedicamentoDto, user);
   }
 

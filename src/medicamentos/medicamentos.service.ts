@@ -26,10 +26,8 @@ async create(createMedicamentoDto: CreateMedicamentoDto, usuario: Usuario) {
       });
       await this.medicamentoRepository.save(medicamento);
 
-      return {
-        medicamento,
-        usuario: usuario.nombre, 
-      };
+      return medicamento;
+
     } catch (error) {
       console.log(error);
       throw handleCustomError(error);
