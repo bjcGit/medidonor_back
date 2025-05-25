@@ -15,8 +15,8 @@ export class Entrega {
   @JoinColumn({ name: 'medicamentoId' })
   medicamento: Medicamento;
 
-  @Column('date')
-  fechaEntrega: Date;
+  @Column('text', { nullable: true, default: 'No registra' })
+  fechaEntrega: string;
 
   @Column('int')
   cantidadEntregada: number; // Nueva columna para registrar la cantidad entregada

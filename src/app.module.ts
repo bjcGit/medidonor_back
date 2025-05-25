@@ -5,8 +5,8 @@ import { CommonModule } from "./common/common.module";
 import { AuthModule } from "./auth/auth.module";
 import { UsuariosModule } from "./usuarios/usuarios.module";
 import { SeedModule } from "./seed/seed.module";
-import { MedicamentosModule } from './medicamentos/medicamentos.module';
-import { EntregasModule } from './entregas/entregas.module';
+import { MedicamentosModule } from "./medicamentos/medicamentos.module";
+import { EntregasModule } from "./entregas/entregas.module";
 
 @Module({
   imports: [
@@ -20,6 +20,9 @@ import { EntregasModule } from './entregas/entregas.module';
     //   database: process.env.PD_NAMEDB,
     //   autoLoadEntities: true,
     //   synchronize: true,
+    //   ssl: {
+    //     rejectUnauthorized: false,
+    //   },
     // }),
 
     //Para deplegar en render
@@ -29,7 +32,7 @@ import { EntregasModule } from './entregas/entregas.module';
       autoLoadEntities: true,
       synchronize: true,
       ssl: {
-        rejectUnauthorized: false, 
+        rejectUnauthorized: false,
       },
     }),
 

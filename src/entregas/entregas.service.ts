@@ -12,6 +12,7 @@ import { Entrega } from "./entities/entregas.entity";
 import { MedicamentosService } from "src/medicamentos/medicamentos.service";
 import { UsuariosService } from "src/usuarios/usuarios.service";
 import { Medicamento } from "src/medicamentos/entities/medicamento.entity";
+import { handleCustomError } from "src/functions/error";
 
 @Injectable()
 export class EntregasService {
@@ -46,11 +47,11 @@ export class EntregasService {
     }
 
     // Validar fecha de entrega
-    const fechaEntrega = new Date(createEntregaDto.fechaEntrega);
-    const hoy = new Date();
-    if (fechaEntrega < hoy) {
-      throw new BadRequestException("La fecha de entrega no puede ser en el pasado");
-    }
+    // const fechaEntrega = new Date(createEntregaDto.fechaEntrega);
+    // const hoy = new Date();
+    // if (fechaEntrega < hoy) {
+    //   throw new BadRequestException("La fecha de entrega no puede ser en el pasado");
+    // }
 
     // Usar QueryRunner para transacción
     const queryRunner = this.dataSource.createQueryRunner();
@@ -121,77 +122,85 @@ export class EntregasService {
     return entrega;
   }
 
-  async update(id: string, updateEntregaDto: UpdateEntregasDto): Promise<Entrega> {
-    this.logger.log(`Actualizando entrega con ID ${id}, DTO: ${JSON.stringify(updateEntregaDto)}`);
-    const entrega = await this.findOne(id);
+ async update(id: string, updateEntregaDto: UpdateEntregasDto): Promise<Entrega> {
+ 
+  const entrega = await this.findOne(id);
 
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
+  const queryRunner = this.dataSource.createQueryRunner();
+  await queryRunner.connect();
+  await queryRunner.startTransaction();
 
-    try {
-      // Validar usuario si se proporciona
-      if (updateEntregaDto.usuarioId) {
-        const usuario = await this.usuariosService.findOne(updateEntregaDto.usuarioId);
-        if (!usuario || !usuario.isActive) {
-          this.logger.warn(`Usuario con ID ${updateEntregaDto.usuarioId} no encontrado o inactivo`);
-          throw new BadRequestException("Usuario inválido o inactivo");
-        }
-        entrega.usuario = usuario;
+  try {
+    // Validar usuario si se proporciona
+    if (updateEntregaDto.usuarioId) {
+      const usuario = await this.usuariosService.findOne(updateEntregaDto.usuarioId);
+      if (!usuario || !usuario.isActive) {
+        this.logger.warn(`Usuario con ID ${updateEntregaDto.usuarioId} no encontrado o inactivo`);
+        throw new BadRequestException('Usuario inválido o inactivo');
       }
-
-      // Validar medicamento si se proporciona
-      if (updateEntregaDto.medicamentoId) {
-        const medicamento = await this.medicamentosService.findOne(updateEntregaDto.medicamentoId);
-        if (!medicamento || !medicamento.isActive || medicamento.disponibilidad !== "Disponible") {
-          this.logger.warn(`Medicamento con ID ${updateEntregaDto.medicamentoId} no encontrado, inactivo o no disponible`);
-          throw new BadRequestException("Medicamento inválido, inactivo o no disponible");
-        }
-        entrega.medicamento = medicamento;
-      }
-
-      // Validar cantidad si se proporciona
-      if (updateEntregaDto.cantidadEntregada) {
-        const diferencia = updateEntregaDto.cantidadEntregada - entrega.cantidadEntregada;
-        if (diferencia > 0 && entrega.medicamento.cantidad < diferencia) {
-          this.logger.warn(`Cantidad insuficiente para medicamento ${entrega.medicamento.nombre}. Disponible: ${entrega.medicamento.cantidad}, Solicitada: ${diferencia}`);
-          throw new BadRequestException("Cantidad insuficiente de medicamento");
-        }
-        entrega.medicamento.cantidad -= diferencia;
-        if (entrega.medicamento.cantidad === 0) {
-          entrega.medicamento.disponibilidad = "Agotado";
-        }
-        await queryRunner.manager.update(Medicamento, { id: entrega.medicamento.id }, {
-          cantidad: entrega.medicamento.cantidad,
-          disponibilidad: entrega.medicamento.disponibilidad,
-        });
-        entrega.cantidadEntregada = updateEntregaDto.cantidadEntregada;
-      }
-
-      // Validar fecha si se proporciona
-      if (updateEntregaDto.fechaEntrega) {
-        const fechaEntrega = new Date(updateEntregaDto.fechaEntrega);
-        const hoy = new Date();
-        if (fechaEntrega < hoy) {
-          this.logger.warn(`Fecha de entrega ${updateEntregaDto.fechaEntrega} es anterior a la fecha actual`);
-          throw new BadRequestException("La fecha de entrega no puede ser en el pasado");
-        }
-        entrega.fechaEntrega = fechaEntrega;
-      }
-
-      const updatedEntrega = await queryRunner.manager.save(entrega);
-      await queryRunner.commitTransaction();
-
-      this.logger.log(`Entrega con ID ${id} actualizada`);
-      return updatedEntrega;
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      this.logger.error(`Error al actualizar la entrega: ${error.message}`);
-      throw new BadRequestException("No se pudo actualizar la entrega");
-    } finally {
-      await queryRunner.release();
+      entrega.usuario = usuario;
+      this.logger.log(`Usuario actualizado a ${usuario.nombre} (ID: ${usuario.id})`);
     }
+
+    // Validar medicamento si se proporciona
+    let medicamento = entrega.medicamento;
+    if (updateEntregaDto.medicamentoId) {
+      medicamento = await this.medicamentosService.findOne(updateEntregaDto.medicamentoId);
+      if (!medicamento || !medicamento.isActive || medicamento.disponibilidad !== 'Disponible') {
+        this.logger.warn(`Medicamento con ID ${updateEntregaDto.medicamentoId} no encontrado, inactivo o no disponible`);
+        throw new BadRequestException('Medicamento inválido, inactivo o no disponible');
+      }
+      entrega.medicamento = medicamento;
+      this.logger.log(`Medicamento actualizado a ${medicamento.nombre} (ID: ${medicamento.id})`);
+    }
+
+    // Validar cantidad si se proporciona
+    if (updateEntregaDto.cantidadEntregada) {
+      // Revalidar el medicamento para evitar problemas de concurrencia
+      const medicamentoActual = await queryRunner.manager.findOne(Medicamento, {
+        where: { id: medicamento.id, isActive: true, disponibilidad: 'Disponible' },
+      });
+      if (!medicamentoActual) {
+        this.logger.warn(`Medicamento con ID ${medicamento.id} no es válido en la transacción`);
+        throw new BadRequestException('Medicamento no disponible o inválido');
+      }
+
+      const diferencia = updateEntregaDto.cantidadEntregada - entrega.cantidadEntregada;
+      if (diferencia > 0 && medicamentoActual.cantidad < diferencia) {
+        throw new BadRequestException('Cantidad insuficiente de medicamento');
+      }
+
+      // Actualizar la cantidad del medicamento
+      medicamentoActual.cantidad -= diferencia;
+      if (medicamentoActual.cantidad === 0) {
+        medicamentoActual.disponibilidad = 'Agotado';
+      }
+      await queryRunner.manager.update(Medicamento, { id: medicamentoActual.id }, {
+        cantidad: medicamentoActual.cantidad,
+        disponibilidad: medicamentoActual.disponibilidad,
+      });
+      entrega.cantidadEntregada = updateEntregaDto.cantidadEntregada;
+      entrega.medicamento = medicamentoActual;
+    }
+
+    // Actualizar fechaEntrega si se proporciona
+    if (updateEntregaDto.fechaEntrega !== undefined) {
+      entrega.fechaEntrega = updateEntregaDto.fechaEntrega || 'No registra';
+      this.logger.log(`Fecha de entrega actualizada a ${entrega.fechaEntrega}`);
+    }
+
+    const updatedEntrega = await queryRunner.manager.save(entrega);
+    await queryRunner.commitTransaction();
+    this.logger.log(`Entrega con ID ${id} actualizada exitosamente`);
+    return updatedEntrega;
+  } catch (error) {
+    await queryRunner.rollbackTransaction();
+    this.logger.error(`Error al actualizar la entrega con ID ${id}: ${error.message}`);
+    throw handleCustomError(error);
+  } finally {
+    await queryRunner.release();
   }
+}
 
   async remove(id: string): Promise<void> {
     this.logger.log(`Eliminando entrega con ID ${id}`);
