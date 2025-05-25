@@ -8,6 +8,9 @@ import { AuthModule } from 'src/auth/auth.module';
   providers: [UsuariosService],
   imports:[
     AuthModule
+  ],
+  exports:[
+    UsuariosService
   ]
 })
 export class UsuariosModule {}

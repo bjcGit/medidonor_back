@@ -10,7 +10,8 @@ import { UsuariosService } from "./usuarios.service";
 import { UpdateUserDto } from "src/auth/dto/update-user.dto";
 import { Auth } from "src/auth/decorator/auth.decorator";
 import { Rol } from "src/auth/interfaces/valid-rol";
-import { ApiTags } from "@nestjs/swagger";
+import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { Usuario } from "src/auth/entities/user.entity";
 
 @ApiTags("usuarios")
 @Controller("usuarios")
@@ -39,5 +40,11 @@ export class UsuariosController {
   // @Auth(Rol.admin)
   desactivar(@Param("id") id: string) {
     return this.usuariosService.desactivar(id);
+  }
+
+  @Get('documento/:documento')
+  @ApiOperation({ summary: 'Obtener un usuario por documento' })
+  findByDocumento(@Param('documento') documento: string): Promise<Usuario> {
+    return this.usuariosService.findByDocumento(documento);
   }
 }

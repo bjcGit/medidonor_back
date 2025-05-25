@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UpdateUserDto } from 'src/auth/dto/update-user.dto';
 import { Usuario } from 'src/auth/entities/user.entity';
@@ -9,7 +9,7 @@ import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class UsuariosService {
-
+  private readonly logger = new Logger(UsuariosService.name);
   constructor(
     @InjectRepository(Usuario)
     private readonly usuarioRepository: Repository<Usuario>,
@@ -112,4 +112,41 @@ async update(id: string, updateUserDto: UpdateUserDto): Promise<Usuario> {
       throw new BadRequestException(`No se pudo cambiar el estado del usuario con el ID: ${id}`);
     }
   }
+
+  async findByDocumento(documento: string): Promise<Usuario> {
+    try {
+      const usuario = await this.usuarioRepository
+        .createQueryBuilder('usuario')
+        .leftJoinAndSelect('usuario.medicamentos', 'medicamentos')
+        .where('usuario.documento = :documento', { documento })
+        .andWhere('usuario.isActive = :isActive', { isActive: true })
+        .select([
+          'usuario.id',
+          'usuario.documento',
+          'usuario.nombre',
+          'usuario.telefono',
+          'usuario.correo',
+          'usuario.direccion',
+          'usuario.rols',
+          'usuario.isActive',
+          'medicamentos.id',
+          'medicamentos.nombre',
+          'medicamentos.cantidad',
+          'medicamentos.disponibilidad',
+        ])
+        .getOne();
+
+      if (!usuario) {
+        throw new NotFoundException(`No se encontró el usuario con documento: ${documento}`);
+      }
+
+      // Excluir la contraseña de la respuesta
+      const { password, ...userWithoutPassword } = usuario;
+      return userWithoutPassword as Usuario;
+    } catch (error) {
+      this.logger.error(`Error al buscar usuario por documento ${documento}: ${error.message}`);
+      throw handleCustomError(error);
+    }
+  }
+
 }
