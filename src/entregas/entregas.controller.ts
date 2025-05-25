@@ -11,7 +11,7 @@ import {
 import { EntregasService } from "./entregas.service";
 import { CreateEntregasDto } from "./dto/create-entregas.dto";
 import { UpdateEntregasDto } from "./dto/update-entregas.dto";
-import { ApiOperation, ApiResponse } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiResponse } from "@nestjs/swagger";
 import { Entrega } from "./entities/entregas.entity";
 import { Auth } from "src/auth/decorator/auth.decorator";
 import { GetUser } from "src/auth/decorator/get-user.decorator";
@@ -22,6 +22,7 @@ export class EntregasController {
   constructor(private readonly entregasService: EntregasService) {}
 
   @Post()
+   @ApiBearerAuth('token')
   @ApiOperation({ summary: "Crear una nueva entrega" })
   @ApiResponse({ status: 201, description: "Entrega creada", type: Entrega })
   @ApiResponse({ status: 400, description: "Solicitud inválida" })
@@ -60,7 +61,7 @@ export class EntregasController {
     description: "Entrega actualizada",
     type: Entrega,
   })
-  @ApiResponse({ status: 404, description: "Entrega no encontrada" })
+  @ApiBearerAuth('token')
   update(
     @Param("id") id: string,
     @Body() updateEntregaDto: UpdateEntregasDto
@@ -69,6 +70,7 @@ export class EntregasController {
   }
 
   @Delete(":id")
+   @ApiBearerAuth('token')
   @ApiOperation({ summary: "Eliminar una entrega" })
   @ApiResponse({ status: 200, description: "Entrega eliminada" })
   @ApiResponse({ status: 404, description: "Entrega no encontrada" })
