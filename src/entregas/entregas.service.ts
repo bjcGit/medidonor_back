@@ -40,7 +40,12 @@ export class EntregasService {
 
     // Validar medicamento
     const medicamento = await this.medicamentosService.findOne(createEntregaDto.medicamentoId);
-    if (!medicamento || !medicamento.isActive || medicamento.disponibilidad !== "Disponible") {
+    this.logger.debug(`Medicamento encontrado: ${JSON.stringify(medicamento)}`);
+    if (
+      !medicamento ||
+      !medicamento.isActive ||
+      (medicamento.disponibilidad || '').toLowerCase().trim() !== "disponible"
+    ) {
       throw new BadRequestException("Medicamento inválido, inactivo o no disponible");
     }
 
