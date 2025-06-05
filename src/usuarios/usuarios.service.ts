@@ -29,22 +29,24 @@ export class UsuariosService {
     }
   }
 
-  async findOne(id: string): Promise<Usuario> {
+async findOne(id: string): Promise<Usuario> {
+  try {
+    const usuario = await this.usuarioRepository.findOneBy({ id });
 
-    try {
-
-      const usuario = await this.usuarioRepository.findOneBy({ id })
-
-      if (!usuario.isActive) {
-        throw new BadRequestException('El usuario esta desactivado')
-      } else {
-        return usuario
-      }
-    } catch (error) {
-      console.log(error)
-      throw new BadRequestException(`No se encontro el ID: ${id}`)
+    if (!usuario) {
+      throw new BadRequestException(`Usuario no registrado o inactivo`);
     }
+
+    if (!usuario.isActive) {
+      throw new BadRequestException('El usuario esta desactivado');
+    }
+
+    return usuario;
+  } catch (error) {
+    console.log(error);
+    throw new BadRequestException(`No se encontro el ID: ${id}`);
   }
+}
 
 async update(id: string, updateUserDto: UpdateUserDto): Promise<Usuario> {
   try {

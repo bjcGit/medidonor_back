@@ -19,7 +19,7 @@ export class Entrega {
   fechaEntrega: string;
 
   @Column('int')
-  cantidadEntregada: number; // Nueva columna para registrar la cantidad entregada
+  cantidadEntregada: number;
 
   @CreateDateColumn()
   createdAt: Date;

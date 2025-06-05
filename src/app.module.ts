@@ -20,9 +20,6 @@ import { EntregasModule } from "./entregas/entregas.module";
     //   database: process.env.PD_NAMEDB,
     //   autoLoadEntities: true,
     //   synchronize: true,
-    //   ssl: {
-    //     rejectUnauthorized: false,
-    //   },
     // }),
 
     //Para deplegar en render

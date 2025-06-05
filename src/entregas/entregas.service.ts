@@ -30,8 +30,12 @@ export class EntregasService {
     
     // Validar usuario
     const usuario = await this.usuariosService.findOne(createEntregaDto.usuarioId);
-    if (!usuario || !usuario.isActive) {
-      throw new BadRequestException("Usuario inválido o inactivo");
+    if (!usuario ) {
+      throw new BadRequestException("Usuario no valido o inactivo");
+    }
+
+    if (!usuario.isActive ) {
+      throw new BadRequestException("Usuario inactivo");
     }
 
     // Validar medicamento
@@ -84,6 +88,7 @@ export class EntregasService {
 
       return savedEntrega;
     } catch (error) {
+      console.log(error)
       await queryRunner.rollbackTransaction();
       this.logger.error(`Error al crear la entrega: ${error.message}`);
       throw new BadRequestException("No se pudo crear la entrega");
