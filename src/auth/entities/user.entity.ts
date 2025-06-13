@@ -30,7 +30,7 @@ export class Usuario {
   @Column('text', { unique: true })
   telefono: string;
 
-  @Column('text', { unique: true })
+  @Column('text', { nullable: true, default: 'No registra' })
   correo: string;
 
   @Column('text', { select: false, nullable: true, default: 'No registra' })

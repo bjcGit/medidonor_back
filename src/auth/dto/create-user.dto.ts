@@ -26,12 +26,13 @@ export class CreateUserDto {
     @Matches(/^[0-9]{10}$/, { message: 'El telefono debe tener 10 digitos' })
     telefono: string;
 
+    @IsOptional()
     @ApiProperty()
     @IsString({
         message: 'El correo es necesario'
     })
     @IsEmail({}, { message: 'El correo no es valido' })
-    correo: string;
+    correo?: string;
 
     @ApiProperty()
     @IsString({

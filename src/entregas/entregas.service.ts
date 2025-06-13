@@ -23,7 +23,7 @@ export class EntregasService {
     private readonly entregaRepository: Repository<Entrega>,
     private readonly usuariosService: UsuariosService,
     private readonly medicamentosService: MedicamentosService,
-    private readonly dataSource: DataSource // Inyectar DataSource para QueryRunner
+    private readonly dataSource: DataSource 
   ) {}
 
   async create(createEntregaDto: CreateEntregasDto): Promise<Entrega> {
@@ -38,9 +38,7 @@ export class EntregasService {
       throw new BadRequestException("Usuario inactivo");
     }
 
-    // Validar medicamento
     const medicamento = await this.medicamentosService.findOne(createEntregaDto.medicamentoId);
-    this.logger.debug(`Medicamento encontrado: ${JSON.stringify(medicamento)}`);
     if (
       !medicamento ||
       !medicamento.isActive ||
