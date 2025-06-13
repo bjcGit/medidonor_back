@@ -8,6 +8,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
+import { CompuestoDto } from "../dto/compuesto-medicamento.dto";
 
 @Entity("medicamentos")
 export class Medicamento {
@@ -28,6 +29,9 @@ export class Medicamento {
 
   @Column("text", { nullable: true, default: "No registra" })
   descripcion: string;
+
+  @Column("jsonb", { nullable: true })
+  compuesto: CompuestoDto[];
 
   @ManyToOne(() => Usuario, (usuario) => usuario.medicamentos, { nullable: false })
   @JoinColumn({ name: 'usuarioId' })
