@@ -19,7 +19,8 @@ import { EntregasModule } from './entregas/entregas.module';
         autoLoadEntities: true,
         synchronize: true,
         ssl: {
-          rejectUnauthorized: false,
+          rejectUnauthorized: true,
+          ca: process.env.AIVEN_CA_CERT,
         },
       }),
     }),
