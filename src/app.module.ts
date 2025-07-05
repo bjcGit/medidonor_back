@@ -28,23 +28,24 @@ import * as path from "path";
     // }),
 
     //Para deplegar en render
-   TypeOrmModule.forRoot({
-  type: "postgres",
-  url: process.env.DATABASE_URL,
-  autoLoadEntities: true,
-  synchronize: true,
-  ssl: process.env.SSL_REJECT_UNAUTHORIZED === "false"
-    ? { rejectUnauthorized: false }
-    : false, 
-}),,
-
-    CommonModule,
-    AuthModule,
-    UsuariosModule,
-    SeedModule,
-    MedicamentosModule,
-    EntregasModule,
-  ],
+imports: [
+  ConfigModule.forRoot(),
+  TypeOrmModule.forRoot({
+    type: "postgres",
+    url: process.env.DATABASE_URL,
+    autoLoadEntities: true,
+    synchronize: true,
+    ssl: process.env.SSL_REJECT_UNAUTHORIZED === "false"
+      ? { rejectUnauthorized: false }
+      : false,
+  }),
+  CommonModule,
+  AuthModule,
+  UsuariosModule,
+  SeedModule,
+  MedicamentosModule,
+  EntregasModule,
+],
   controllers: [],
   providers: [],
 })
