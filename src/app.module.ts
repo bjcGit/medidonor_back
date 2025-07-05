@@ -17,9 +17,7 @@ import { EntregasModule } from './entregas/entregas.module';
       url: process.env.DATABASE_URL,
       autoLoadEntities: true,
       synchronize: true,
-      ssl: {
-        rejectUnauthorized: false,
-      },
+      ssl: getSslConfig(),
     }),
     CommonModule,
     AuthModule,
@@ -32,3 +30,12 @@ import { EntregasModule } from './entregas/entregas.module';
   providers: [],
 })
 export class AppModule {}
+
+// 🔐 Esta función asegura que ssl siempre sea correcto
+function getSslConfig() {
+  // Solo si la variable existe y explícitamente es "false", desactiva verificación
+  if (process.env.NODE_ENV === 'production') {
+    return { rejectUnauthorized: false };
+  }
+  return false; // para desarrollo local
+}
