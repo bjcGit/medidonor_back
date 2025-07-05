@@ -17,7 +17,9 @@ import { EntregasModule } from './entregas/entregas.module';
       url: process.env.DATABASE_URL,
       autoLoadEntities: true,
       synchronize: true,
-      ssl: getSslOptionSafe(), // función segura
+      ssl: {
+        rejectUnauthorized: false,
+      },
     }),
     CommonModule,
     AuthModule,
@@ -30,14 +32,3 @@ import { EntregasModule } from './entregas/entregas.module';
   providers: [],
 })
 export class AppModule {}
-
-function getSslOptionSafe() {
-  const raw = process.env.SSL_REJECT_UNAUTHORIZED;
-  if (!raw) return false;
-
-  const lowered = raw.toLowerCase();
-  if (lowered === 'false') return { rejectUnauthorized: false };
-  if (lowered === 'true') return { rejectUnauthorized: true };
-
-  return false; // nunca devolver string ni undefined
-}
