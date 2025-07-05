@@ -31,9 +31,6 @@ import { EntregasModule } from "./entregas/entregas.module";
       url: process.env.DATABASE_URL,
       autoLoadEntities: true,
       synchronize: true,
-      ssl: {
-        rejectUnauthorized: false,
-      },
     }),
 
     CommonModule,
