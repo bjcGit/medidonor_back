@@ -34,8 +34,8 @@ import * as path from "path";
       autoLoadEntities: true,
       synchronize: true,
       ssl: {
-        ca: fs.readFileSync(path.join(__dirname, "..", "certs", "ca.pem")).toString(),
-        rejectUnauthorized: true,
+        ca: fs.readFileSync(path.join(__dirname, "certs", "ca.pem")).toString(),
+        rejectUnauthorized: false,
       },
     }),
 
