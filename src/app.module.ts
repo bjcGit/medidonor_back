@@ -35,7 +35,6 @@ import { EntregasModule } from "./entregas/entregas.module";
         rejectUnauthorized: false,
       },
     }),
-
     CommonModule,
     AuthModule,
     UsuariosModule,
@@ -46,4 +45,4 @@ import { EntregasModule } from "./entregas/entregas.module";
   controllers: [],
   providers: [],
 })
-export class AppModule { }
+export class AppModule {}
