@@ -28,16 +28,15 @@ import * as path from "path";
     // }),
 
     //Para deplegar en render
-    TypeOrmModule.forRoot({
-      type: "postgres",
-      url: process.env.DATABASE_URL,
-      autoLoadEntities: true,
-      synchronize: true,
-      ssl: {
-        ca: fs.readFileSync(path.join(__dirname, "certs", "ca.pem")).toString(),
-        rejectUnauthorized: false,
-      },
-    }),
+   TypeOrmModule.forRoot({
+  type: "postgres",
+  url: process.env.DATABASE_URL,
+  autoLoadEntities: true,
+  synchronize: true,
+  ssl: process.env.SSL_REJECT_UNAUTHORIZED === "false"
+    ? { rejectUnauthorized: false }
+    : undefined,
+}),
 
     CommonModule,
     AuthModule,
