@@ -20,7 +20,7 @@ import { EntregasModule } from './entregas/entregas.module';
         synchronize: true,
         ssl: {
           rejectUnauthorized: true,
-          ca: process.env.AIVEN_CA_CERT,
+          ca: process.env.AIVEN_CA_CERT?.replace(/\\n/g, '\n'),
         },
       }),
     }),
