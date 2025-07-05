@@ -17,9 +17,7 @@ import { EntregasModule } from './entregas/entregas.module';
       url: process.env.DATABASE_URL,
       autoLoadEntities: true,
       synchronize: true,
-      ssl: process.env.SSL_REJECT_UNAUTHORIZED === 'false'
-        ? { rejectUnauthorized: false }
-        : false,
+      ssl: getSslOption(),
     }),
     CommonModule,
     AuthModule,
@@ -32,3 +30,14 @@ import { EntregasModule } from './entregas/entregas.module';
   providers: [],
 })
 export class AppModule {}
+
+function getSslOption() {
+  const ssl = process.env.SSL_REJECT_UNAUTHORIZED?.toLowerCase();
+  if (ssl === 'false') {
+    return { rejectUnauthorized: false };
+  }
+  if (ssl === 'true') {
+    return { rejectUnauthorized: true };
+  }
+  return false; // 👈 Importante para evitar errores con pg
+}
