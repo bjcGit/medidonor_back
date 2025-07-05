@@ -7,6 +7,8 @@ import { UsuariosModule } from "./usuarios/usuarios.module";
 import { SeedModule } from "./seed/seed.module";
 import { MedicamentosModule } from "./medicamentos/medicamentos.module";
 import { EntregasModule } from "./entregas/entregas.module";
+import * as fs from "fs";
+import * as path from "path";
 
 @Module({
   imports: [
@@ -32,7 +34,8 @@ import { EntregasModule } from "./entregas/entregas.module";
       autoLoadEntities: true,
       synchronize: true,
       ssl: {
-        rejectUnauthorized: false,
+        ca: fs.readFileSync(path.join(__dirname, "certs/ca.pem")).toString(),
+        rejectUnauthorized: true,
       },
     }),
 
