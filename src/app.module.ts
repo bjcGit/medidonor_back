@@ -12,15 +12,21 @@ import { EntregasModule } from "./entregas/entregas.module";
 @Module({
   imports: [
     ConfigModule.forRoot(),
+
+function getSslOption() {
+  const sslReject = process.env.SSL_REJECT_UNAUTHORIZED;
+  if (sslReject === 'false') return { rejectUnauthorized: false };
+  if (sslReject === 'true') return { rejectUnauthorized: true };
+  return false; // 🔥 clave: no dejarlo como undefined
+}
+
     TypeOrmModule.forRoot({
-      type: "postgres",
-      url: process.env.DATABASE_URL,
-      autoLoadEntities: true,
-      synchronize: true,
-      ssl: process.env.SSL_REJECT_UNAUTHORIZED === "false"
-        ? { rejectUnauthorized: false }
-        : false,
-    }),
+  type: 'postgres',
+  url: process.env.DATABASE_URL,
+  autoLoadEntities: true,
+  synchronize: true,
+  ssl: getSslOption(),
+}),
     CommonModule,
     AuthModule,
     UsuariosModule,
