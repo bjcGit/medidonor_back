@@ -35,8 +35,8 @@ import * as path from "path";
   synchronize: true,
   ssl: process.env.SSL_REJECT_UNAUTHORIZED === "false"
     ? { rejectUnauthorized: false }
-    : undefined,
-}),
+    : false, 
+}),,
 
     CommonModule,
     AuthModule,
